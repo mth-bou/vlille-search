@@ -1,0 +1,71 @@
+<div class="row">
+  <div class="col-5 card-margin mt-3 mb-3">
+    <div class="card-body p-0">
+      <div *ngIf="loading === true; else loadingComplete" class="col-2">
+        <div class="spinner-border" role="status">
+        </div>
+      </div>
+      <ng-template #loadingComplete>
+          <form [formGroup]="searchForm" id="search-form" class="col-10">
+            <div class="row">
+                <div class="col-12">
+                    <div class="row no-gutters">
+                        <div class="col-lg-10 col-md-10 col-sm-10 p-0">
+                            <input type="text"
+                                  (keyup)="searchInput.next($event)"
+                                  placeholder="Station recherchée..."
+                                  class="form-control" id="search"
+                                  formControlName="search"
+                                  name="search"
+                                  required
+                                  minlength="3"
+                                  maxlength="50"
+                                  pattern="^[a-zA-Z0-9_]*$" />
+                        </div>
+                        <span *ngIf="search.touched && search.errors?.required">
+                          Veuillez entrer au moins un mot clé
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </form>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <table class="table table-hover table-dark rounded">
+      <thead>
+        <tr>
+          <th scope="col">Commune</th>
+          <th scope="col">Nom de la station</th>
+          <th scope="col">En service</th>
+          <th scope="col">Vélos disponibles</th>
+          <th scope="col">Places disponibles</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let result of searchResults">
+          <th scope="row">{{ result.fields.commune }}</th>
+
+          <td>{{ result.fields.nom}}</td>
+
+          <td *ngIf="result.fields.etat === 'EN SERVICE'; else serviceTemplate" class="isGreen">Oui</td>
+          <ng-template #serviceTemplate><td class="isRed">Non</td></ng-template>
+
+          <td *ngIf="result.fields.nbvelosdispo === 0; else veloTemplate" class="isRed">{{ result.fields.nbvelosdispo }}</td>
+          <ng-template #veloTemplate><td>{{ result.fields.nbvelosdispo }}</td></ng-template>
+
+          <td *ngIf="result.fields.nbplacesdispo === 0; else placeTemplate" class="isRed">{{ result.fields.nbplacesdispo }}</td>
+          <ng-template #placeTemplate><td>{{ result.fields.nbplacesdispo }}</td></ng-template>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div *ngIf="errorMessage" class="alert-danger">
+  <p class="error">{{ errorMessage }}</p>
+</div>
